@@ -614,6 +614,3 @@ if __name__ == '__main__':
     # exiting the program
 
     input("press enter to exit ")
-
-
-    
