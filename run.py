@@ -61,7 +61,35 @@ def visualizer(sample_array, settings_array):
     Create an array of colors to be displayed on the LED strips given an array of audio samples
     '''
 
-    strips = Strips()
+    # strips = Strips(
+    #     LED_1_COUNT=None,
+    #     LED_1_PIN=None,
+    #     LED_1_FREQ_HZ=None,
+    #     LED_1_DMA=None,
+    #     LED_1_INVERT=None,
+    #     LED_1_BRIGHTNESS=None,
+    #     LED_1_CHANNEL=None
+    # )
+    strips = Strips(
+        LED_1_COUNT=LED_1_COUNT,
+        LED_1_PIN=LED_1_PIN,
+        LED_1_FREQ_HZ=LED_1_FREQ_HZ,
+        LED_1_DMA=LED_1_DMA,
+        LED_1_INVERT=LED_1_BRIGHTNESS,
+        LED_1_BRIGHTNESS=LED_1_INVERT,
+        LED_1_CHANNEL=LED_1_CHANNEL
+    )
+
+    strips1 = Strips(
+        LED_1_COUNT=LED_2_COUNT,
+        LED_1_PIN=LED_2_PIN,
+        LED_1_FREQ_HZ=LED_2_FREQ_HZ,
+        LED_1_DMA=LED_2_DMA,
+        LED_1_INVERT=LED_2_BRIGHTNESS,
+        LED_1_BRIGHTNESS=LED_2_INVERT,
+        LED_1_CHANNEL=LED_2_CHANNEL
+    )
+
     vis_index = -1
     new_vis_index = 0
 
@@ -95,6 +123,7 @@ def visualizer(sample_array, settings_array):
 
         # send the color array to the strips
         strips.write(color_array)
+        strips1.write(color_array)
 
 def settings_getter(settings_array):
     '''

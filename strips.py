@@ -1,11 +1,10 @@
 from neopixel import *
-from config import *
 import numpy as np
 import time
 
 
 class Strips:
-    def __init__(self):
+    def __init__(self, LED_1_COUNT=None, LED_1_PIN=None, LED_1_FREQ_HZ=None, LED_1_DMA=None, LED_1_INVERT=None, LED_1_BRIGHTNESS=None, LED_1_CHANNEL=None):
         self.strip1 = Adafruit_NeoPixel(LED_1_COUNT, LED_1_PIN, LED_1_FREQ_HZ, LED_1_DMA, LED_1_INVERT, LED_1_BRIGHTNESS, LED_1_CHANNEL)
         # self.strip2 = Adafruit_NeoPixel(LED_2_COUNT, LED_2_PIN, LED_2_FREQ_HZ, LED_2_DMA, LED_2_INVERT, LED_2_BRIGHTNESS, LED_2_CHANNEL) # IZZY: strip2 disabled
         self.strip1.begin()
