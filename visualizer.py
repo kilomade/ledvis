@@ -615,6 +615,16 @@ vis_list = [StripsOff,
             Planets,
             Rain]
 
+jordyn_vis_list = [
+    StripsOff,
+    FFTRainbow,
+    Sparkle,
+    VooMeter,
+    Pillars,
+    Planets,
+    Rain
+]
+
 ###################################################################################################
 # Experimental stuff
 ###################################################################################################
