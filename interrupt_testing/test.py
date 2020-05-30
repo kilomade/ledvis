@@ -8,21 +8,12 @@
 import signal
 import sys
 import RPi.GPIO as GPIO
-import config
 
 try:
-    from IOPi import IOPi
-except ImportError:
-    print("Failed to import IOPi from python system path")
-    print("Importing from parent folder instead")
-    try:
-        import sys
-        sys.path.append("..")
-        from IOPi import IOPi
-    except ImportError:
-        raise ImportError(
-            "Failed to import library from parent folder")
-
+    import utils.config
+except:
+    print(e)
+    
 bus=None
 
 def speed_adj_down(interupt_pin):
@@ -60,19 +51,18 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 if __name__ == '__main__':
-    global bus
-
-    bus = IOPi(0x20)
-    bus.set_port_pullups(0, 0xFF)
-    bus.set_port_direction(0, 0xFF)
-    bus.invert_port(0, 0xFF)
-    bus.set_interrupt_polarity(0)
-    bus.mirror_interrupts(0)
-    bus.set_interrupt_defaults(0, 0x00)
-    bus.set_interrupt_type(0, 0xFF)
-    bus.set_interrupt_on_port(0, 0xFF)
-    bus.reset_interrupts()
     GPIO.setmode(GPIO.BCM)
+    
+    DEFAULT_MODE     = 
+    MODE_UP          = 
+    MODE_DOWN        = 
+    TURN_OFF         = 
+    BRIGHTNESS_UP    = 
+    BRIGHTNESS_DOWN  = 
+    BRIGHTNESS_DEF   = 
+    SPEED_ADJ_UP     = 
+    SPEED_ADJ_DOWN   = 
+    SPEED_DEF        = 
 
     GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
