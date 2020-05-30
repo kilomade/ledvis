@@ -55,6 +55,9 @@ def mode_change_down_button_pressed(interrupt_pin):
 def default_mode_button_pressed(interrupt_pin):
     print("Mode default triggered")
 
+def signal_handler(sig, frame):
+    GPIO.cleanup()
+    sys.exit(0)
 
 if __name__ == '__main__':
     global bus
@@ -71,31 +74,29 @@ if __name__ == '__main__':
     bus.reset_interrupts()
     GPIO.setmode(GPIO.BCM)
 
-    # Set up GPIO 23 as an input. The pull-up resistor is disabled as the
-    # level shifter will act as a pull-up.
-    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    # when a falling edge is detected on GPIO 23 the function
-    # button_pressed will be run
+    GPIO.add_event_detect(DEFAULT_MODE, GPIO.BOTH, callback=default_mode_button_pressed, bouncetime=50)
+    GPIO.add_event_detect(MODE_UP, GPIO.BOTH, callback=mode_change_up_button_pressed, bouncetime=50)
+    GPIO.add_event_detect(MODE_DOWN, GPIO.BOTH, callback=mode_change_down_button_pressed, bouncetime=50)
+    GPIO.add_event_detect(TURN_OFF, GPIO.BOTH, callback=turn_off_lights, bouncetime=50)
+    GPIO.add_event_detect(BRIGHTNESS_UP, GPIO.BOTH, callback=brightness_adj_up, bouncetime=50)
+    GPIO.add_event_detect(BRIGHTNESS_DOWN, GPIO.BOTH, callback=brightness_adj_down, bouncetime=50)
+    GPIO.add_event_detect(BRIGHTNESS_DEF, GPIO.BOTH, callback=brightness_adj_default, bouncetime=50)
+    GPIO.add_event_detect(SPEED_ADJ_DOWN, GPIO.BOTH, callback=speed_adj_down, bouncetime=50)
+    GPIO.add_event_detect(SPEED_ADJ_UP, GPIO.BOTH, callback=speed_adj_up, bouncetime=50)
+    GPIO.add_event_detect(SPEED_DEF, GPIO.BOTH, callback=speed_adj_default, bouncetime=50)
 
-    GPIO.add_event_detect(DEFAULT_MODE, GPIO.FALLING, callback=default_mode_button_pressed)
-    GPIO.add_event_detect(MODE_UP, GPIO.FALLING, callback=mode_change_up_button_pressed)
-    GPIO.add_event_detect(MODE_DOWN, GPIO.FALLING, callback=mode_change_down_button_pressed)
-    GPIO.add_event_detect(TURN_OFF, GPIO.FALLING, callback=turn_off_lights)
-    GPIO.add_event_detect(BRIGHTNESS_UP, GPIO.FALLING, callback=brightness_adj_up)
-    GPIO.add_event_detect(BRIGHTNESS_DOWN, GPIO.FALLING, callback=brightness_adj_down)
-    GPIO.add_event_detect(BRIGHTNESS_DEF, GPIO.FALLING, callback=brightness_adj_default)
-    GPIO.add_event_detect(SPEED_ADJ_DOWN, GPIO.FALLING, callback=speed_adj_down)
-    GPIO.add_event_detect(SPEED_ADJ_UP, GPIO.FALLING, callback=speed_adj_up)
-    GPIO.add_event_detect(SPEED_DEF, GPIO.FALLING, callback=speed_adj_default)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.pause()
     # print out a message and wait for keyboard input before
     # exiting the program
