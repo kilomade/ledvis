@@ -53,16 +53,17 @@ def signal_handler(sig, frame):
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     
-    DEFAULT_MODE     = 
-    MODE_UP          = 
-    MODE_DOWN        = 
-    TURN_OFF         = 
-    BRIGHTNESS_UP    = 
-    BRIGHTNESS_DOWN  = 
-    BRIGHTNESS_DEF   = 
-    SPEED_ADJ_UP     = 
-    SPEED_ADJ_DOWN   = 
-    SPEED_DEF        = 
+    DEFAULT_MODE     = 16
+    MODE_UP          = 12
+    MODE_DOWN        = 1
+    TURN_OFF         = 21
+    TURN_ON          = 20
+    BRIGHTNESS_UP    = 8
+    BRIGHTNESS_DOWN  = 25
+    BRIGHTNESS_DEF   = 7
+    SPEED_ADJ_UP     = 23
+    SPEED_ADJ_DOWN   = 18
+    SPEED_DEF        = 24
 
     GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
