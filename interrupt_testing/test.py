@@ -8,6 +8,7 @@
 import signal
 import sys
 import RPi.GPIO as GPIO
+import wiringpi
 
 try:
     import utils.config
@@ -67,12 +68,10 @@ def signal_handler(sig, frame):
 
 
 if __name__ == '__main__':
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BOARD)
 
     DEFAULT_MODE = 16
     MODE_UP = 12
-    MODE_DOWN = 1
+    MODE_DOWN = 5
     TURN_OFF = 21
     TURN_ON = 20
     BRIGHTNESS_UP = 8
@@ -82,29 +81,42 @@ if __name__ == '__main__':
     SPEED_ADJ_DOWN = 18
     SPEED_DEF = 24
 
-    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(TURN_ON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    wiringpi.wiringPiSetupGpio()
+    wiringpi.pinMode(DEFAULT_MODE, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(MODE_UP, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(MODE_DOWN, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(TURN_OFF, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(TURN_ON, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(BRIGHTNESS_UP, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(BRIGHTNESS_DOWN, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(BRIGHTNESS_DEF, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(SPEED_ADJ_UP, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(SPEED_ADJ_DOWN, wiringpi.GPIO.INPUT)
+    wiringpi.pinMode(SPEED_DEF, wiringpi.GPIO.INPUT)
 
-    GPIO.add_event_detect(DEFAULT_MODE, GPIO.BOTH, callback=default_mode_button_pressed, bouncetime=50)
-    GPIO.add_event_detect(MODE_UP, GPIO.BOTH, callback=mode_change_up_button_pressed, bouncetime=50)
-    GPIO.add_event_detect(MODE_DOWN, GPIO.BOTH, callback=mode_change_down_button_pressed, bouncetime=50)
-    GPIO.add_event_detect(TURN_OFF, GPIO.BOTH, callback=turn_off_lights, bouncetime=50)
-    GPIO.add_event_detect(TURN_ON, GPIO.BOTH, callback=turn_on_lights, bouncetime=50)
-    GPIO.add_event_detect(BRIGHTNESS_UP, GPIO.BOTH, callback=brightness_adj_up, bouncetime=50)
-    GPIO.add_event_detect(BRIGHTNESS_DOWN, GPIO.BOTH, callback=brightness_adj_down, bouncetime=50)
-    GPIO.add_event_detect(BRIGHTNESS_DEF, GPIO.BOTH, callback=brightness_adj_default, bouncetime=50)
-    GPIO.add_event_detect(SPEED_ADJ_DOWN, GPIO.BOTH, callback=speed_adj_down, bouncetime=50)
-    GPIO.add_event_detect(SPEED_ADJ_UP, GPIO.BOTH, callback=speed_adj_up, bouncetime=50)
-    GPIO.add_event_detect(SPEED_DEF, GPIO.BOTH, callback=speed_adj_default, bouncetime=50)
+    wiringpi.pullUpDnControl(DEFAULT_MODE, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(MODE_UP, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(MODE_DOWN, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(TURN_OFF, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(TURN_ON, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(BRIGHTNESS_UP, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(BRIGHTNESS_DOWN, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(BRIGHTNESS_DEF, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(SPEED_ADJ_UP, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(SPEED_ADJ_DOWN, wiringpi.GPIO.PUD_DOWN)
+    wiringpi.pullUpDnControl(SPEED_DEF, wiringpi.GPIO.PUD_DOWN)
+
+    wiringpi.wiringPiISR(DEFAULT_MODE, wiringpi.GPIO.INT_EDGE_BOTH, default_mode_button_pressed)
+    wiringpi.wiringPiISR(MODE_UP, wiringpi.GPIO.INT_EDGE_BOTH, mode_change_up_button_pressed)
+    wiringpi.wiringPiISR(MODE_DOWN, wiringpi.GPIO.INT_EDGE_BOTH, mode_change_down_button_pressed)
+    wiringpi.wiringPiISR(TURN_OFF, wiringpi.GPIO.INT_EDGE_BOTH, turn_off_lights)
+    wiringpi.wiringPiISR(TURN_ON, wiringpi.GPIO.INT_EDGE_BOTH, turn_on_lights)
+    wiringpi.wiringPiISR(BRIGHTNESS_UP, wiringpi.GPIO.INT_EDGE_BOTH, brightness_adj_up)
+    wiringpi.wiringPiISR(BRIGHTNESS_DOWN, wiringpi.GPIO.INT_EDGE_BOTH, brightness_adj_down)
+    wiringpi.wiringPiISR(BRIGHTNESS_DEF, wiringpi.GPIO.INT_EDGE_BOTH, brightness_adj_default)
+    wiringpi.wiringPiISR(SPEED_ADJ_DOWN, wiringpi.GPIO.INT_EDGE_BOTH, speed_adj_down)
+    wiringpi.wiringPiISR(SPEED_ADJ_UP, wiringpi.GPIO.INT_EDGE_BOTH, speed_adj_up)
+    wiringpi.wiringPiISR(SPEED_DEF, wiringpi.GPIO.INT_EDGE_BOTH, speed_adj_default)
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.pause()
