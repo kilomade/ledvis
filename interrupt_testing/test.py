@@ -68,18 +68,17 @@ def signal_handler(sig, frame):
 
 
 if __name__ == '__main__':
-
-    DEFAULT_MODE = 16
-    MODE_UP = 12
-    MODE_DOWN = 5
-    TURN_OFF = 21
-    TURN_ON = 20
-    BRIGHTNESS_UP = 8
-    BRIGHTNESS_DOWN = 25
-    BRIGHTNESS_DEF = 7
-    SPEED_ADJ_UP = 23
-    SPEED_ADJ_DOWN = 18
-    SPEED_DEF = 24
+    SPEED_ADJ_DOWN = 1
+    SPEED_ADJ_UP = 4
+    SPEED_DEF = 5
+    BRIGHTNESS_DOWN = 6
+    BRIGHTNESS_UP = 10
+    BRIGHTNESS_DEF = 11
+    MODE_DOWN = 31
+    MODE_UP = 26
+    DEFAULT_MODE = 27
+    TURN_ON = 28
+    TURN_OFF = 29
 
     wiringpi.wiringPiSetupGpio()
     wiringpi.pinMode(DEFAULT_MODE, wiringpi.GPIO.INPUT)
