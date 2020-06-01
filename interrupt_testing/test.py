@@ -37,6 +37,9 @@ def brightness_adj_down(interrupt_pin):
 def turn_off_lights(interrupt_pin):
     print("Lights off triggered")
 
+def turn_on_lights(interrupt_pin):
+    print("Lights on triggered")
+
 def mode_change_up_button_pressed(interrupt_pin):
     print("Mode change up triggered")
 
@@ -65,21 +68,23 @@ if __name__ == '__main__':
     SPEED_ADJ_DOWN   = 18
     SPEED_DEF        = 24
 
-    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(TURN_ON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     GPIO.add_event_detect(DEFAULT_MODE, GPIO.BOTH, callback=default_mode_button_pressed, bouncetime=50)
     GPIO.add_event_detect(MODE_UP, GPIO.BOTH, callback=mode_change_up_button_pressed, bouncetime=50)
     GPIO.add_event_detect(MODE_DOWN, GPIO.BOTH, callback=mode_change_down_button_pressed, bouncetime=50)
     GPIO.add_event_detect(TURN_OFF, GPIO.BOTH, callback=turn_off_lights, bouncetime=50)
+    GPIO.add_event_detect(TURN_ON, GPIO.BOTH, callback=turn_on_lights, bouncetime=50)
     GPIO.add_event_detect(BRIGHTNESS_UP, GPIO.BOTH, callback=brightness_adj_up, bouncetime=50)
     GPIO.add_event_detect(BRIGHTNESS_DOWN, GPIO.BOTH, callback=brightness_adj_down, bouncetime=50)
     GPIO.add_event_detect(BRIGHTNESS_DEF, GPIO.BOTH, callback=brightness_adj_default, bouncetime=50)
@@ -89,5 +94,8 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.pause()
+
+    message = input("Press enter to quit\n\n")
+    GPIO.cleanup()
     # print out a message and wait for keyboard input before
     # exiting the program
