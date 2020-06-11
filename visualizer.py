@@ -71,6 +71,10 @@ class StripsOff(VisualizerBase):
         color_array = np.zeros([LED_1_COUNT,3], dtype=int)
         return color_array
 
+class StripsOn(VisualizerBase):
+    def visualize(self, sample_array):
+        color_array = np.zeros([LED_1_COUNT,3], dtype=int)
+        return color_array
 
 class VooMeter(VisualizerBase):
     def __init__(self, color=np.array([120, 200, 100]), mask_maker=masker.middle_out):
@@ -600,8 +604,9 @@ class Rain(FFTVisualizerBase):
         return np.clip(color_array, 0, 255).astype(int)
 
 
-# this is the list of visualizers to be used by run.py and the web page
-vis_list = [StripsOff,
+# this is the list of visualizers to be used by lightController.py and the web page
+vis_list = [
+            StripsOff,
             Zoom,
             BlobSlider,
             FFTRainbow,
@@ -613,7 +618,9 @@ vis_list = [StripsOff,
             VooMeter,
             Pillars,
             Planets,
-            Rain]
+            Rain,
+            StripsOn
+            ]
 
 jordyn_vis_list = [
     StripsOff,
