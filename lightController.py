@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from multiprocessing import Process, Array
 import pyaudio
 import numpy as np
@@ -7,8 +9,7 @@ from config import *
 from visualizer import vis_list
 from strips import Strips
 from util import FrequencyPrinter, CircularBuffer
-from __future__ import absolute_import, division, print_function, \
-                                                    unicode_literals
+
 import time
 import RPi.GPIO as GPIO
 
@@ -419,7 +420,6 @@ def settings_getter(settings_array):
 
 
 if __name__ == '__main__':
-    global bus
 
     # Create an instance of the IOPi class called bus and
     # set the I2C address to be 0x20 or Bus 1.
