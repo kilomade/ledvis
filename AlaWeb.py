@@ -1,10 +1,8 @@
+import socket
+
 from flask import Flask, render_template, request
 
-import serial, serial.tools.list_ports
-import sys
-import time
-import socket
-import lightController
+import ledvis.lightController as lightController
 
 app = Flask(__name__)
 
@@ -41,7 +39,9 @@ def duration():
 
 @app.route("/color/", methods=['POST'])
 def color():
+    global lcObject
     btn_name = get_btn_name(request)
+    lcObject.messageReceived(identifier=int(btn_name))
     print ("Color:", btn_name )
     
     templateData = {}
@@ -105,23 +105,23 @@ def get_btn_name(request):
     return btn_name
 
 
-def arduino_get_resp(s):
-    time.sleep(.1);
-    while (s.in_waiting > 0):
-        print(s.readline().decode(), end="");
-
-# try to detect the USB port where Arduino is connected
-def arduino_get_port():
-    print("Listing ports")
-    port = None
-    ports = serial.tools.list_ports.comports()
-    for p in ports:
-        print(p)
-        if "Arduino" in p[1]:
-            port = p[0]
-            print("Arduino detected on port", port)
-
-    return port
+# def arduino_get_resp(s):
+#     time.sleep(.1);
+#     while (s.in_waiting > 0):
+#         print(s.readline().decode(), end="");
+#
+# # try to detect the USB port where Arduino is connected
+# def arduino_get_port():
+#     print("Listing ports")
+#     port = None
+#     ports = serial.tools.list_ports.comports()
+#     for p in ports:
+#         print(p)
+#         if "Arduino" in p[1]:
+#             port = p[0]
+#             print("Arduino detected on port", port)
+#
+#     return port
 
 
 def get_ip():
@@ -144,5 +144,6 @@ if __name__ == "__main__":
     print()
 
     #app.run(host='0.0.0.0', port=80, debug=True)
+    lightController.main()
     app.run(host='0.0.0.0', port=80)
 

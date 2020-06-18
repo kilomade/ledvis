@@ -5,10 +5,10 @@ import pyaudio
 import numpy as np
 import time
 import requests
-from config import *
-from visualizer import vis_list
-from strips import Strips
-from util import FrequencyPrinter, CircularBuffer
+import ledvis.config as config
+from ledvis.visualizer import vis_list
+from ledvis.strips import Strips
+from ledvis.util import FrequencyPrinter, CircularBuffer
 
 import time
 import RPi.GPIO as GPIO
@@ -259,7 +259,7 @@ def changeMode(identifier):
 
 
 def runSystemNow():
-    sample_array = Array('i', np.zeros(SAMPLE_ARRAY_SIZE + 1, dtype=int))
+    sample_array = Array('i', np.zeros(config.SAMPLE_ARRAY_SIZE + 1, dtype=int))
     settings_array = Array('i', np.zeros(1, dtype=int))
 
     sampler_process = Process(target=sampler, name='Sampler', args=(sample_array,))
@@ -282,31 +282,31 @@ def sampler(sample_array):
     audio = pyaudio.PyAudio() # create pyaudio instantiation
 
     # create pyaudio stream
-    stream = audio.open(format=FORMAT, rate=SAMPLING_FREQ, channels=NUM_CHANNELS, \
-                        input_device_index=DEVICE_INDEX, input=True, \
-                        frames_per_buffer=CHUNK_SIZE)
+    stream = audio.open(format=config.FORMAT, rate=config.SAMPLING_FREQ, channels=config.NUM_CHANNELS, \
+                        input_device_index=config.DEVICE_INDEX, input=True, \
+                        frames_per_buffer=config.CHUNK_SIZE)
 
     fp = FrequencyPrinter('Sampler')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         try:
-            data = stream.read(CHUNK_SIZE)
+            data = stream.read(config.CHUNK_SIZE)
         except IOError:
             print('Stream overflow!')
             stream.close()
-            stream = audio.open(format=FORMAT, rate=SAMPLING_FREQ, channels=NUM_CHANNELS, \
-                        input_device_index=DEVICE_INDEX, input=True, \
-                        frames_per_buffer=CHUNK_SIZE)
+            stream = audio.open(format=config.FORMAT, rate=config.SAMPLING_FREQ, channels=config.NUM_CHANNELS, \
+                        input_device_index=config.DEVICE_INDEX, input=True, \
+                        frames_per_buffer=config.CHUNK_SIZE)
         int_data = np.fromstring(data, dtype="int16")
         # print stream.get_read_available()
 
         # attempts a non-blocking write to the sample array
         if sample_array.acquire(False):
             sample_start = sample_array[-1]
-            sample_end = sample_start + CHUNK_SIZE
+            sample_end = sample_start + config.CHUNK_SIZE
 
-            if sample_end < SAMPLE_ARRAY_SIZE - 1:
+            if sample_end < config.SAMPLE_ARRAY_SIZE - 1:
                 sample_array[sample_start:sample_end] = int_data # write the newest sample to the array
                 sample_array[-1] = sample_end # store the most recent index last in the array
             # else:
@@ -336,13 +336,13 @@ def visualizer(sample_array, settings_array):
     #     LED_1_CHANNEL=None
     # )
     strips = Strips(
-        LED_1_COUNT=LED_1_COUNT,
-        LED_1_PIN=LED_1_PIN,
-        LED_1_FREQ_HZ=LED_1_FREQ_HZ,
-        LED_1_DMA=LED_1_DMA,
-        LED_1_INVERT=LED_1_BRIGHTNESS,
-        LED_1_BRIGHTNESS=LED_1_INVERT,
-        LED_1_CHANNEL=LED_1_CHANNEL
+        LED_1_COUNT=config.LED_1_COUNT,
+        LED_1_PIN=config.LED_1_PIN,
+        LED_1_FREQ_HZ=config.LED_1_FREQ_HZ,
+        LED_1_DMA=config.LED_1_DMA,
+        LED_1_INVERT=config.LED_1_BRIGHTNESS,
+        LED_1_BRIGHTNESS=config.LED_1_INVERT,
+        LED_1_CHANNEL=config.LED_1_CHANNEL
     )
 
     # strips1 = Strips(
@@ -360,7 +360,7 @@ def visualizer(sample_array, settings_array):
 
     fp = FrequencyPrinter('Visualizer')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         # get the current selected mode
         if settings_array.acquire():
@@ -388,7 +388,6 @@ def visualizer(sample_array, settings_array):
 
         # send the color array to the strips
         strips.write(color_array)
-        strips1.write(color_array)
 
 def settings_getter(settings_array):
     '''
@@ -396,7 +395,7 @@ def settings_getter(settings_array):
     '''
     fp = FrequencyPrinter('Settings Getter')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         # do a get request to the server
         url = 'http://ledvis.local:5000/get_settings'
@@ -467,7 +466,7 @@ if __name__ == '__main__':
 
     # Set up GPIO 23 as an input. The pull-up resistor is disabled as the
     # level shifter will act as a pull-up.
-    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+    GPIO.setup(config.MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
 
     # print out a message and wait for keyboard input before
     # exiting the program
