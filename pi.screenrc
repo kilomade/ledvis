@@ -14,7 +14,7 @@ screen -t " open"
 
 screen -t " run.py"
 stuff "cd /home/pi/ledvis\n"
-stuff "sudo python run.py\n"
+stuff "sudo python AlaWeb.py\n"
 
 screen -t " app.py"
 stuff "cd /home/pi/ledvis/web\n"

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ALA Web Controller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+
+
+</div>
+    <div class="container">
+        <h1>ALA Web Controller</h1>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Animation</div>
+    <div class="panel-body">
+        <form action="/anim/" method="post">
+            <div class="row">
+                <div class="col-sm-4 btn-group-vertical" role="group">
+                    <button class="btn btn-default" name="101" type="submit">On</button>
+                    <button class="btn btn-default" name="102" type="submit">Off</button>
+                    <button class="btn btn-default" name="103" type="submit">Brightness Up</button>
+                    <button class="btn btn-default" name="104" type="submit">Brightness Default</button>
+                    <button class="btn btn-default" name="105" type="submit">Brightness Down</button>
+                    <button class="btn btn-default" name="106" type="submit">Speed Up</button>
+                    <button class="btn btn-default" name="107" type="submit">Speed Default</button>
+                    <button class="btn btn-default" name="108" type="submit">Speed Down</button>
+                </div>
+                <div class="col-sm-4 btn-group-vertical">
+                    <!--button class="btn btn-default" name="201" type="submit">Pixel Shift Right</button-->
+                    <!--button class="btn btn-default" name="202" type="submit">Pixel Shift Left</button-->
+                    <!--button class="btn btn-default" name="203" type="submit">Pixel Bounce</button-->
+                    <button class="btn btn-default" name="201" type="submit">Zoom</button>
+                    <button class="btn btn-default" name="202" type="submit">Blob Slider</button>
+                    <button class="btn btn-default" name="203" type="submit">FFT Rainbow</button>
+                    <button class="btn btn-default" name="204" type="submit">Blocks</button>
+                    <button class="btn btn-default" name="205" type="submit">FFT</button>
+                    <button class="btn btn-default" name="206" type="submit">Sparkle</button>
+                    <button class="btn btn-default" name="207" type="submit">Pancakes</button>
+                </div>
+                <div class="col-sm-4 btn-group-vertical">
+                    <button class="btn btn-default" name="208" type="submit">Stones</button>
+                    <button class="btn btn-default" name="209" type="submit">VooMeter</button>
+                    <button class="btn btn-default" name="210" type="submit">Pillars</button>
+                    <button class="btn btn-default" name="211" type="submit">Planets</button>
+                    <button class="btn btn-default" name="212" type="submit">Rain</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="row">
+<div class="col-sm-4">
+    <div class="panel panel-default">
+        <div class="panel-heading">Brightness</div>
+        <div class="panel-body" class="btn-group" role="group">
+            <form action="/brightness/" method="post">
+                <button class="btn btn-default" name="8" type="submit">20%</button>
+                <button class="btn btn-default" name="16" type="submit">40%</button>
+                <button class="btn btn-default" name="32" type="submit">60%</button>
+                <button class="btn btn-default" name="64" type="submit">80%</button>
+                <button class="btn btn-default" name="100" type="submit">100%</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">Color</div>
+<div class="panel-body">
+    <form action="/color/" method="post">
+        <div class="row">
+            <div class="col-sm-4 btn-group" role="group">
+                <button class="btn btn-default" name="88CCFF" type="submit">*Cool White</button>
+                <button class="btn btn-default" name="DDDDDD" type="submit">*Natural White</button>
+                <button class="btn btn-default" name="FFCC88" type="submit">*Warm White</button>
+            </div>
+		</div>
+		<div class="row">
+            <div class="col-sm-12 btn-group" role="group">
+                <button class="btn btn-default" name="FF0000" type="submit">*Red</button>
+                <button class="btn btn-default" name="FFD700" type="submit">*Gold</button>
+                <button class="btn btn-default" name="FFA500" type="submit">*Orange</button>
+                <button class="btn btn-default" name="DC143C" type="submit">*Crimson</button>
+                <button class="btn btn-default" name="FF00FF" type="submit">*Magenta</button>
+                <button class="btn btn-default" name="EE82EE" type="submit">*Violet</button>
+                <button class="btn btn-default" name="800080" type="submit">*Purple</button>
+                <button class="btn btn-default" name="0000FF" type="submit">*Blue</button>
+                <button class="btn btn-default" name="00FFFF" type="submit">*Cyan</button>
+                <button class="btn btn-default" name="008080" type="submit">*Teal</button>
+                <button class="btn btn-default" name="40E0D0" type="submit">*Turquoise</button>
+                <button class="btn btn-default" name="00FF00" type="submit">*Green</button>
+                <button class="btn btn-default" name="FFFF00" type="submit">*Yellow</button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Palette</div>
+    <div class="panel-body">
+        <form action="/palette/" method="post">
+            <div class="row">
+                <div class="col-sm-12 btn-group" role="group">
+                    <button class="btn btn-default" name="0" type="submit">*Null</button>
+                    <button class="btn btn-default" name="1" type="submit">*RGB</button>
+                    <button class="btn btn-default" name="2" type="submit">*Rainbow</button>
+                    <button class="btn btn-default" name="3" type="submit">*Party</button>
+                    <button class="btn btn-default" name="4" type="submit">*Heat</button>
+                    <button class="btn btn-default" name="5" type="submit">*Fire</button>
+                    <button class="btn btn-default" name="6" type="submit">*Cool</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+        
+        <p>Click <a href="/">here</a> to go home.</p>
+    </div>
+</body>
+</html>

@@ -1,14 +1,15 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from multiprocessing import Process, Array
 import pyaudio
 import numpy as np
 import time
 import requests
-from config import *
-from visualizer import jordyn_vis_list as vis_list
-from strips import Strips
-from util import FrequencyPrinter, CircularBuffer
-from __future__ import absolute_import, division, print_function, \
-                                                    unicode_literals
+import ledvis.config as config
+from ledvis.visualizer import vis_list
+from ledvis.strips import Strips
+from ledvis.util import FrequencyPrinter, CircularBuffer
+
 import time
 import RPi.GPIO as GPIO
 
@@ -63,8 +64,34 @@ speed_levels = [
 speed_level_index = 2
 speed_level_range = len(speed_levels)
 
+#TODO finish this method for changing modes, brightness, and speed
+def messageReceived(identifier):
+    assignments = {
+        101: changeMode(identifier=13),
+        102: changeMode(identifier=0),
+        103: brightness_adj(trigger=1),
+        104: brightness_adj(trigger=0),
+        105: brightness_adj(trigger=2),
+        106: speed_adj(trigger=1),
+        107: speed_adj(trigger=0),
+        108: speed_adj(trigger=2),
+        201: changeMode(identifier=1),
+        202: changeMode(identifier=2),
+        203: changeMode(identifier=3),
+        204: changeMode(identifier=4),
+        205: changeMode(identifier=5),
+        206: changeMode(identifier=6),
+        207: changeMode(identifier=7),
+        208: changeMode(identifier=8),
+        209: changeMode(identifier=9),
+        210: changeMode(identifier=10),
+        211: changeMode(identifier=11),
+        212: changeMode(identifier=12)
+    }
 
-def speed_adj_down(interupt_pin):
+    assignments[identifier]
+
+def speed_adj(trigger):
     global light_brightness_levels
     global speed_level_index
     global speed_levels
@@ -72,7 +99,17 @@ def speed_adj_down(interupt_pin):
     global LED_WRITE_DELAY
 
     bus = None
-    speed_level_index -= 1
+
+    if trigger == 0:
+        #Default mode
+        speed_level_index = 2
+    elif trigger == 1:
+        #Increase Speed
+        speed_level_index += 1
+    elif trigger == 2:
+        #Decrease speed
+        speed_level_index -= 1
+
     LED_WRITE_DELAY = speed_levels[speed_level_index]
 
     """
@@ -97,73 +134,7 @@ def speed_adj_down(interupt_pin):
 
     runSystemNow()
 
-def speed_adj_up(interupt_pin):
-    global light_brightness_levels
-    global speed_level_index
-    global speed_levels
-    global bus
-    global LED_WRITE_DELAY
-
-    bus = None
-    speed_level_index += 1
-    LED_WRITE_DELAY = speed_levels[speed_level_index]
-
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
-
-    runSystemNow()
-
-def speed_adj_default(interupt_pin):
-    global light_brightness_levels
-    global speed_level_index
-    global speed_levels
-    global bus
-    global LED_WRITE_DELAY
-
-    bus = None
-    speed_level_index = 2
-    LED_WRITE_DELAY = speed_levels[speed_level_index]
-
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
-
-    runSystemNow()
-
-def brightness_adj_default(interupt_pin):
+def brightness_adj(trigger, levelIndicator=None):
     global light_brightness_levels
     global brightness_level_index
     global bus
@@ -189,76 +160,41 @@ def brightness_adj_default(interupt_pin):
         if (intval & (1 << num)):
             print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
 
-    brightness_level_index = 5
+
+    if levelIndicator is not None:
+        if levelIndicator == 20:
+            config.LED_1_BRIGHTNESS = 52
+        elif levelIndicator == 40:
+            config.LED_1_BRIGHTNESS = 102
+        elif levelIndicator == 60:
+            config.LED_1_BRIGHTNESS = 153
+        elif levelIndicator == 80:
+            config.LED_1_BRIGHTNESS = 204
+        elif levelIndicator == 100:
+            config.LED_1_BRIGHTNESS = 255
+    else:
+        if trigger == 0:
+            brightness_level_index = 5
+
+            config.LED_1_BRIGHTNESS = light_brightness_levels[brightness_level_index]
+        elif trigger == 1:
+            brightness_level_index += 1
+
+            if brightness_level_index > (brightness_level_index - 1):
+                brightness_level_index = 0
+
+            config.LED_1_BRIGHTNESS = light_brightness_levels[brightness_level_index]
+        elif trigger == 2:
+            brightness_level_index -= 1
+
+            if brightness_level_index < 0:
+                brightness_level_index = (brightness_level_range - 1)
+
+            config.LED_1_BRIGHTNESS = light_brightness_levels[brightness_level_index]
 
     runSystemNow()
 
-def brightness_adj_up(interupt_pin):
-    global light_brightness_levels
-    global brightness_level_index
-    global bus
-    bus = None
-
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
-
-    brightness_level_index += 1
-
-    if brightness_level_index > (brightness_level_index - 1):
-        brightness_level_index = 0
-
-    runSystemNow()
-
-def brightness_adj_down(interrupt_pin):
-    global light_brightness_levels
-    global brightness_level_index
-    global bus
-    bus = None
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
-
-    brightness_level_index -= 1
-
-    if brightness_level_index < 0:
-        brightness_level_index = (brightness_level_range - 1)
-
-    runSystemNow()
-
-def turn_off_lights(interrupt_pin):
+def turn_off_lights():
     global bus
     global mode_index
     bus = None
@@ -285,16 +221,11 @@ def turn_off_lights(interrupt_pin):
 
     runSystemNow()
 
-def mode_change_up_button_pressed(interrupt_pin):
+def turn_on_lights():
     global bus
     global mode_index
     bus = None
-
-
-    mode_index += 1
-
-    if mode_index > (mode_index - 1):
-        mode_index = 0
+    mode_index = 0
     """
     this function will be called when GPIO 23 falls low
     """
@@ -317,67 +248,18 @@ def mode_change_up_button_pressed(interrupt_pin):
 
     runSystemNow()
 
-def mode_change_down_button_pressed(interrupt_pin):
+def changeMode(identifier):
     global bus
     global mode_index
     bus = None
 
-    if mode_index == 0:
-        mode_index -= mode_range - 1
-    else:
-        mode_index -1
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Mode Changed to " + str(modes[mode_index]))
+    mode_index = identifier
 
     runSystemNow()
 
-def default_mode_button_pressed(interrupt_pin):
-    global bus
-    global mode_index
-    bus = None
-    mode_index = 1
-
-    """
-    this function will be called when GPIO 23 falls low
-    """
-    # read the interrupt capture for port 0 and store it in variable intval
-    intval = bus.read_interrupt_capture(0)
-
-    # compare the value of intval with the IO Pi port 0
-    # using read_port().  wait until the port changes which will indicate
-    # the button has been released.
-    # without this while loop the function will keep repeating.
-
-    while (intval == bus.read_port(0)):
-        time.sleep(0.2)
-
-    # loop through each bit in the intval variable and check if the bit is 1
-    # which will indicate a button has been pressed
-    for num in range(0, 8):
-        if (intval & (1 << num)):
-            print("Pin " + str(num + 1) + " pressed: Default Mode enabled")
-
-    runSystemNow()
 
 def runSystemNow():
-    sample_array = Array('i', np.zeros(SAMPLE_ARRAY_SIZE + 1, dtype=int))
+    sample_array = Array('i', np.zeros(config.SAMPLE_ARRAY_SIZE + 1, dtype=int))
     settings_array = Array('i', np.zeros(1, dtype=int))
 
     sampler_process = Process(target=sampler, name='Sampler', args=(sample_array,))
@@ -400,31 +282,31 @@ def sampler(sample_array):
     audio = pyaudio.PyAudio() # create pyaudio instantiation
 
     # create pyaudio stream
-    stream = audio.open(format=FORMAT, rate=SAMPLING_FREQ, channels=NUM_CHANNELS, \
-                        input_device_index=DEVICE_INDEX, input=True, \
-                        frames_per_buffer=CHUNK_SIZE)
+    stream = audio.open(format=config.FORMAT, rate=config.SAMPLING_FREQ, channels=config.NUM_CHANNELS, \
+                        input_device_index=config.DEVICE_INDEX, input=True, \
+                        frames_per_buffer=config.CHUNK_SIZE)
 
     fp = FrequencyPrinter('Sampler')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         try:
-            data = stream.read(CHUNK_SIZE)
+            data = stream.read(config.CHUNK_SIZE)
         except IOError:
             print('Stream overflow!')
             stream.close()
-            stream = audio.open(format=FORMAT, rate=SAMPLING_FREQ, channels=NUM_CHANNELS, \
-                        input_device_index=DEVICE_INDEX, input=True, \
-                        frames_per_buffer=CHUNK_SIZE)
+            stream = audio.open(format=config.FORMAT, rate=config.SAMPLING_FREQ, channels=config.NUM_CHANNELS, \
+                        input_device_index=config.DEVICE_INDEX, input=True, \
+                        frames_per_buffer=config.CHUNK_SIZE)
         int_data = np.fromstring(data, dtype="int16")
         # print stream.get_read_available()
 
         # attempts a non-blocking write to the sample array
         if sample_array.acquire(False):
             sample_start = sample_array[-1]
-            sample_end = sample_start + CHUNK_SIZE
+            sample_end = sample_start + config.CHUNK_SIZE
 
-            if sample_end < SAMPLE_ARRAY_SIZE - 1:
+            if sample_end < config.SAMPLE_ARRAY_SIZE - 1:
                 sample_array[sample_start:sample_end] = int_data # write the newest sample to the array
                 sample_array[-1] = sample_end # store the most recent index last in the array
             # else:
@@ -454,31 +336,31 @@ def visualizer(sample_array, settings_array):
     #     LED_1_CHANNEL=None
     # )
     strips = Strips(
-        LED_1_COUNT=LED_1_COUNT,
-        LED_1_PIN=LED_1_PIN,
-        LED_1_FREQ_HZ=LED_1_FREQ_HZ,
-        LED_1_DMA=LED_1_DMA,
-        LED_1_INVERT=LED_1_BRIGHTNESS,
-        LED_1_BRIGHTNESS=LED_1_INVERT,
-        LED_1_CHANNEL=LED_1_CHANNEL
+        LED_1_COUNT=config.LED_1_COUNT,
+        LED_1_PIN=config.LED_1_PIN,
+        LED_1_FREQ_HZ=config.LED_1_FREQ_HZ,
+        LED_1_DMA=config.LED_1_DMA,
+        LED_1_INVERT=config.LED_1_BRIGHTNESS,
+        LED_1_BRIGHTNESS=config.LED_1_INVERT,
+        LED_1_CHANNEL=config.LED_1_CHANNEL
     )
 
-    strips1 = Strips(
-        LED_1_COUNT=LED_2_COUNT,
-        LED_1_PIN=LED_2_PIN,
-        LED_1_FREQ_HZ=LED_2_FREQ_HZ,
-        LED_1_DMA=LED_2_DMA,
-        LED_1_INVERT=LED_2_BRIGHTNESS,
-        LED_1_BRIGHTNESS=LED_2_INVERT,
-        LED_1_CHANNEL=LED_2_CHANNEL
-    )
+    # strips1 = Strips(
+    #     LED_1_COUNT=LED_2_COUNT,
+    #     LED_1_PIN=LED_2_PIN,
+    #     LED_1_FREQ_HZ=LED_2_FREQ_HZ,
+    #     LED_1_DMA=LED_2_DMA,
+    #     LED_1_INVERT=LED_2_BRIGHTNESS,
+    #     LED_1_BRIGHTNESS=LED_2_INVERT,
+    #     LED_1_CHANNEL=LED_2_CHANNEL
+    # )
 
     vis_index = -1
     new_vis_index = mode_index
 
     fp = FrequencyPrinter('Visualizer')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         # get the current selected mode
         if settings_array.acquire():
@@ -506,7 +388,6 @@ def visualizer(sample_array, settings_array):
 
         # send the color array to the strips
         strips.write(color_array)
-        strips1.write(color_array)
 
 def settings_getter(settings_array):
     '''
@@ -514,7 +395,7 @@ def settings_getter(settings_array):
     '''
     fp = FrequencyPrinter('Settings Getter')
     while True:
-        if PRINT_LOOP_FREQUENCY: fp.tick()
+        if config.PRINT_LOOP_FREQUENCY: fp.tick()
 
         # do a get request to the server
         url = 'http://ledvis.local:5000/get_settings'
@@ -538,7 +419,6 @@ def settings_getter(settings_array):
 
 
 if __name__ == '__main__':
-    global bus
 
     # Create an instance of the IOPi class called bus and
     # set the I2C address to be 0x20 or Bus 1.
@@ -586,30 +466,8 @@ if __name__ == '__main__':
 
     # Set up GPIO 23 as an input. The pull-up resistor is disabled as the
     # level shifter will act as a pull-up.
-    GPIO.setup(DEFAULT_MODE, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(MODE_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(TURN_OFF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(BRIGHTNESS_DEF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_ADJ_UP, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_ADJ_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
-    GPIO.setup(SPEED_DEF, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
+    GPIO.setup(config.MODE_DOWN, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
 
-    # when a falling edge is detected on GPIO 23 the function
-    # button_pressed will be run
-
-    GPIO.add_event_detect(DEFAULT_MODE, GPIO.FALLING, callback=default_mode_button_pressed)
-    GPIO.add_event_detect(MODE_UP, GPIO.FALLING, callback=mode_change_up_button_pressed)
-    GPIO.add_event_detect(MODE_DOWN, GPIO.FALLING, callback=mode_change_down_button_pressed)
-    GPIO.add_event_detect(TURN_OFF, GPIO.FALLING, callback=turn_off_lights)
-    GPIO.add_event_detect(BRIGHTNESS_UP, GPIO.FALLING, callback=brightness_adj_up)
-    GPIO.add_event_detect(BRIGHTNESS_DOWN, GPIO.FALLING, callback=brightness_adj_down)
-    GPIO.add_event_detect(BRIGHTNESS_DEF, GPIO.FALLING, callback=brightness_adj_default)
-    GPIO.add_event_detect(SPEED_ADJ_DOWN, GPIO.FALLING, callback=speed_adj_down)
-    GPIO.add_event_detect(SPEED_ADJ_UP, GPIO.FALLING, callback=speed_adj_up)
-    GPIO.add_event_detect(SPEED_DEF, GPIO.FALLING, callback=speed_adj_default)
     # print out a message and wait for keyboard input before
     # exiting the program
 
